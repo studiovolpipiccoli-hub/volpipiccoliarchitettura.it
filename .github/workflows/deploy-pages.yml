@@ -21,8 +21,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
 
-      - name: Extract static site
+      - name: Extract bundled site
         run: mkdir -p site && tar -xzf volpi-piccoli-site.tar.gz -C site
+
+      - name: Apply latest site files
+        run: cp -a site-overrides/. site/
 
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
