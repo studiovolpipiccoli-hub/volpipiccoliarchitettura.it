@@ -42,3 +42,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
   window.setInterval(advance, 3200);
 });
+
+
+document.addEventListener("click", (event) => {
+  const opener = event.target.closest("[data-profile-open]");
+  if (opener) document.querySelector('[data-profile="' + opener.dataset.profileOpen + '"]')?.showModal();
+  const closer = event.target.closest(".profile-dialog-close");
+  if (closer) closer.closest("dialog")?.close();
+  if (event.target.matches?.(".profile-dialog")) event.target.close();
+});
