@@ -4,26 +4,29 @@ document.addEventListener("DOMContentLoaded", () => {
   if (!carousel || !track) return;
 
   let paused = false;
-  let previous = performance.now();
   const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-  const move = (time) => {
-    const delta = Math.min(time - previous, 40);
-    previous = time;
-    if (!paused && !reduceMotion) {
-      track.scrollLeft += delta * 0.025;
-      const halfway = track.scrollWidth / 2;
-      if (halfway > 0 && track.scrollLeft >= halfway) track.scrollLeft -= halfway;
-    }
-    requestAnimationFrame(move);
+  const cardStep = () => {
+    const card = track.querySelector(".carousel-project");
+    return (card?.offsetWidth || track.clientWidth * 0.72) + 24;
+  };
+
+  const normalize = () => {
+    const halfway = track.scrollWidth / 2;
+    if (track.scrollLeft >= halfway) track.scrollLeft -= halfway;
   };
 
   const moveByCard = (direction) => {
-    const card = track.querySelector(".carousel-project");
+    normalize();
     track.scrollBy({
-      left: direction * ((card?.offsetWidth || track.clientWidth * 0.72) + 24),
-      behavior: "smooth",
+      left: direction * cardStep(),
+      behavior: reduceMotion ? "auto" : "smooth",
     });
+    window.setTimeout(normalize, reduceMotion ? 0 : 700);
+  };
+
+  const advance = () => {
+    if (!paused) moveByCard(1);
   };
 
   carousel.addEventListener("mouseenter", () => { paused = true; });
@@ -32,8 +35,10 @@ document.addEventListener("DOMContentLoaded", () => {
   carousel.addEventListener("focusout", () => { paused = false; });
   carousel.addEventListener("touchstart", () => { paused = true; }, { passive: true });
   carousel.addEventListener("touchend", () => { paused = false; }, { passive: true });
+  carousel.addEventListener("touchcancel", () => { paused = false; }, { passive: true });
 
   carousel.querySelector('[aria-label="Progetto precedente"]')?.addEventListener("click", () => moveByCard(-1));
   carousel.querySelector('[aria-label="Progetto successivo"]')?.addEventListener("click", () => moveByCard(1));
-  requestAnimationFrame(move);
+
+  window.setInterval(advance, 3200);
 });
