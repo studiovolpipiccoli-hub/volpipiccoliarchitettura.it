@@ -51,3 +51,39 @@ document.addEventListener("click", (event) => {
   if (closer) closer.closest("dialog")?.close();
   if (event.target.matches?.(".profile-dialog")) event.target.close();
 });
+
+
+/* privacy-map-v1 */
+document.addEventListener("click", (event) => {
+  const loadButton = event.target.closest("[data-map-load]");
+  if (loadButton) {
+    const map = loadButton.closest(".map-consent-shell");
+    const panel = map?.querySelector("[data-map-consent]");
+    if (!map || !panel || map.querySelector("iframe")) return;
+
+    const iframe = document.createElement("iframe");
+    iframe.title = "Mappa Google Maps dello studio Volpi Piccoli Architettura";
+    iframe.src = "https://www.google.com/maps?q=45.46840,10.60161&z=16&output=embed";
+    iframe.referrerPolicy = "no-referrer-when-downgrade";
+    iframe.allowFullscreen = true;
+
+    const disable = document.createElement("button");
+    disable.type = "button";
+    disable.className = "map-disable";
+    disable.dataset.mapDisable = "";
+    disable.textContent = "Disattiva mappa";
+
+    panel.replaceWith(iframe);
+    map.appendChild(disable);
+  }
+
+  const disableButton = event.target.closest("[data-map-disable]");
+  if (disableButton) {
+    const map = disableButton.closest(".map-consent-shell");
+    if (!map) return;
+    map.querySelector("iframe")?.remove();
+    disableButton.remove();
+    const logo = map.querySelector(".contact-map-logo");
+    logo?.insertAdjacentHTML("beforebegin", '<div class="map-consent" data-map-consent><p class="eyebrow">Google Maps disattivato</p><h3>La vostra privacy viene prima.</h3><p>La mappa è bloccata per evitare collegamenti a Google senza una vostra scelta. Attivandola, l’indirizzo IP e dati tecnici del dispositivo potranno essere trattati da Google secondo la propria informativa.</p><button type="button" data-map-load>Carica la mappa</button><a href="/privacy/#google-maps">Dettagli nella Privacy e Cookie Policy</a></div>');
+  }
+});
